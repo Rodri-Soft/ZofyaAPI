@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Rodrigo Sanchez\\OneDrive - Universidad Veracruzana\\Documentos\\SextoSemestre\\Desarrollo de sistemas en red\\Proyecto\\ZofyaApi\\ZofyaApi.csproj": {}
+    "C:\\Users\\Propietario\\Desktop\\ZofyaAPI\\ZofyaApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Rodrigo Sanchez\\OneDrive - Universidad Veracruzana\\Documentos\\SextoSemestre\\Desarrollo de sistemas en red\\Proyecto\\ZofyaApi\\ZofyaApi.csproj": {
+    "C:\\Users\\Propietario\\Desktop\\ZofyaAPI\\ZofyaApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Rodrigo Sanchez\\OneDrive - Universidad Veracruzana\\Documentos\\SextoSemestre\\Desarrollo de sistemas en red\\Proyecto\\ZofyaApi\\ZofyaApi.csproj",
+        "projectUniqueName": "C:\\Users\\Propietario\\Desktop\\ZofyaAPI\\ZofyaApi.csproj",
         "projectName": "ZofyaApi",
-        "projectPath": "C:\\Users\\Rodrigo Sanchez\\OneDrive - Universidad Veracruzana\\Documentos\\SextoSemestre\\Desarrollo de sistemas en red\\Proyecto\\ZofyaApi\\ZofyaApi.csproj",
-        "packagesPath": "C:\\Users\\Rodrigo Sanchez\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Rodrigo Sanchez\\OneDrive - Universidad Veracruzana\\Documentos\\SextoSemestre\\Desarrollo de sistemas en red\\Proyecto\\ZofyaApi\\obj\\",
+        "projectPath": "C:\\Users\\Propietario\\Desktop\\ZofyaAPI\\ZofyaApi.csproj",
+        "packagesPath": "C:\\Users\\Propietario\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Propietario\\Desktop\\ZofyaAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\Rodrigo Sanchez\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Propietario\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
@@ -46,6 +46,22 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.5, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[6.0.5, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.5, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.2.3, )"

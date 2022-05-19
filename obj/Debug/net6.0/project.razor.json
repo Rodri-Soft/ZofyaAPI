@@ -1,5 +1,5 @@
 {
-  "FilePath": "c:\\Users\\Rodrigo Sanchez\\OneDrive - Universidad Veracruzana\\Documentos\\SextoSemestre\\Desarrollo de aplicaciones\\ProyectosFEI\\ServiciosWebFEI\\ServiciosWebFEI.csproj",
+  "FilePath": "c:\\Users\\Propietario\\Desktop\\ZofyaAPI\\ZofyaApi.csproj",
   "Configuration": {
     "ConfigurationName": "MVC-3.0",
     "LanguageVersion": "6.0",
@@ -16295,7 +16295,7 @@
     ],
     "CSharpLanguageVersion": 1000
   },
-  "RootNamespace": "ServiciosWebFEI",
+  "RootNamespace": "ZofyaApi",
   "Documents": [],
   "SerializationFormat": "0.2"
 }
