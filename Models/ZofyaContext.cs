@@ -22,6 +22,7 @@ namespace ZofyaApi.Models
         public virtual DbSet<Item> Items { get; set; } = null!;
         public virtual DbSet<ItemShoppingCart> ItemShoppingCarts { get; set; } = null!;
         public virtual DbSet<Item_Color> Item_Colors { get; set; } = null!;
+        public virtual DbSet<Item_Image> Item_Images { get; set; } = null!;
         public virtual DbSet<Item_Size> Item_Sizes { get; set; } = null!;
         public virtual DbSet<Item_WishList> Item_WishLists { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
@@ -49,28 +50,28 @@ namespace ZofyaApi.Models
                 entity.ToTable("Address");
 
                 entity.Property(e => e.City)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Colony)
                     .HasMaxLength(50)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InsideNumber)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.OutSideNumber)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.PostalCode)
-                    .HasMaxLength(5)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.StreetName)
                     .HasMaxLength(50)
-                    .IsFixedLength();
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Customer>(entity =>
@@ -83,23 +84,24 @@ namespace ZofyaApi.Models
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(50)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.FullName)
                     .HasMaxLength(100)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Phone)
                     .HasMaxLength(10)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.IDShoppingCartNavigation)
                     .WithMany(p => p.Customers)
                     .HasForeignKey(d => d.IDShoppingCart)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Customer_ShoppingCart");
             });
 
@@ -127,24 +129,28 @@ namespace ZofyaApi.Models
                 entity.ToTable("Item");
 
                 entity.Property(e => e.SKU)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Category)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(100)
-                    .IsFixedLength();
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Discount).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
-                    .IsFixedLength();
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Price).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.Status)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<ItemShoppingCart>(entity =>
@@ -154,8 +160,10 @@ namespace ZofyaApi.Models
                 entity.ToTable("ItemShoppingCart");
 
                 entity.Property(e => e.SKU)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TotalItem).HasColumnType("decimal(18, 0)");
 
                 entity.HasOne(d => d.IDShoppingCartNavigation)
                     .WithMany(p => p.ItemShoppingCarts)
@@ -175,12 +183,12 @@ namespace ZofyaApi.Models
                 entity.ToTable("Item_Color");
 
                 entity.Property(e => e.Color)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.SKU)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.SKUNavigation)
                     .WithMany()
@@ -188,17 +196,35 @@ namespace ZofyaApi.Models
                     .HasConstraintName("FK_Item_Color_Item");
             });
 
+            modelBuilder.Entity<Item_Image>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("Item_Image");
+
+                entity.Property(e => e.ImageURL).IsUnicode(false);
+
+                entity.Property(e => e.SKU)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.SKUNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.SKU)
+                    .HasConstraintName("FK_Item_Image_Item");
+            });
+
             modelBuilder.Entity<Item_Size>(entity =>
             {
                 entity.HasNoKey();
 
                 entity.Property(e => e.SKU)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Size)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.SKUNavigation)
                     .WithMany()
@@ -215,8 +241,8 @@ namespace ZofyaApi.Models
                 entity.Property(e => e.IDItemWishList).ValueGeneratedNever();
 
                 entity.Property(e => e.SKU)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.IDWishListNavigation)
                     .WithMany(p => p.Item_WishLists)
@@ -240,12 +266,14 @@ namespace ZofyaApi.Models
                 entity.Property(e => e.DeliveryDate).HasColumnType("date");
 
                 entity.Property(e => e.OrderNumber)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Status)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TotalToPay).HasColumnType("decimal(18, 0)");
 
                 entity.HasOne(d => d.IDUserNavigation)
                     .WithMany(p => p.Orders)
@@ -258,6 +286,8 @@ namespace ZofyaApi.Models
                 entity.HasKey(e => e.IDShoppingCart);
 
                 entity.ToTable("ShoppingCart");
+
+                entity.Property(e => e.TotalBalance).HasColumnType("decimal(18, 0)");
             });
 
             modelBuilder.Entity<WishList>(entity =>
@@ -267,8 +297,8 @@ namespace ZofyaApi.Models
                 entity.ToTable("WishList");
 
                 entity.Property(e => e.Name)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.IDUserNavigation)
                     .WithMany(p => p.WishLists)
@@ -283,32 +313,32 @@ namespace ZofyaApi.Models
                 entity.ToTable("Staff");
 
                 entity.Property(e => e.RFC)
-                    .HasMaxLength(13)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.CURP)
-                    .HasMaxLength(18)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(50)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.FullName)
                     .HasMaxLength(100)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Phone)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Rol)
-                    .HasMaxLength(20)
-                    .IsFixedLength();
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);

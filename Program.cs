@@ -5,7 +5,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
             builder => {
-                builder.WithOrigins("https://localhost:7120").AllowAnyHeader().AllowAnyMethod();
+                builder.WithOrigins("https://localhost:7295").AllowAnyHeader().AllowAnyMethod();
             });
 });
 
@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// builder.Services.AddDbContext<AlumnosFEI.Models.AlumnosContext>(ServiceLifetime.Scoped);
+builder.Services.AddDbContext<ZofyaApi.Models.ZofyaContext>(ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

@@ -10,7 +10,7 @@ namespace ZofyaApi.Models
         public DateTime DeliveryDate { get; set; }
         public string OrderNumber { get; set; } = null!;
         public string Status { get; set; } = null!;
-        public double TotalToPay { get; set; }
+        public decimal TotalToPay { get; set; }
         public int IDUser { get; set; }
 
         public virtual Customer IDUserNavigation { get; set; } = null!;
