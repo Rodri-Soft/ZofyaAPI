@@ -91,18 +91,12 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .HasMaxLength(50)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Phone)
                     .HasMaxLength(10)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.IDShoppingCartNavigation)
-                    .WithMany(p => p.Customers)
-                    .HasForeignKey(d => d.IDShoppingCart)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Customer_ShoppingCart");
             });
 
             modelBuilder.Entity<Customer_Address>(entity =>
@@ -164,11 +158,6 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.TotalItem).HasColumnType("decimal(18, 0)");
-
-                entity.HasOne(d => d.IDShoppingCartNavigation)
-                    .WithMany(p => p.ItemShoppingCarts)
-                    .HasForeignKey(d => d.IDShoppingCart)
-                    .HasConstraintName("FK_ItemShoppingCart_ShoppingCart");
 
                 entity.HasOne(d => d.SKUNavigation)
                     .WithMany(p => p.ItemShoppingCarts)
@@ -288,6 +277,11 @@ namespace ZofyaApi.Models
                 entity.ToTable("ShoppingCart");
 
                 entity.Property(e => e.TotalBalance).HasColumnType("decimal(18, 0)");
+
+                entity.HasOne(d => d.IDUserNavigation)
+                    .WithMany(p => p.ShoppingCarts)
+                    .HasForeignKey(d => d.IDUser)
+                    .HasConstraintName("FK_ShoppingCart_Customer");
             });
 
             modelBuilder.Entity<WishList>(entity =>

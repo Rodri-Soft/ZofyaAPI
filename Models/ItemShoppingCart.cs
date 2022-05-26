@@ -11,7 +11,6 @@ namespace ZofyaApi.Models
         public int QuantityOfItems { get; set; }
         public decimal TotalItem { get; set; }
 
-        public virtual ShoppingCart IDShoppingCartNavigation { get; set; } = null!;
         public virtual Item SKUNavigation { get; set; } = null!;
     }
 }

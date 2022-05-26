@@ -9,6 +9,7 @@ namespace ZofyaApi.Models
         {
             Customer_Addresses = new HashSet<Customer_Address>();
             Orders = new HashSet<Order>();
+            ShoppingCarts = new HashSet<ShoppingCart>();
             WishLists = new HashSet<WishList>();
         }
 
@@ -18,11 +19,10 @@ namespace ZofyaApi.Models
         public string FullName { get; set; } = null!;
         public string Password { get; set; } = null!;
         public string Phone { get; set; } = null!;
-        public int? IDShoppingCart { get; set; }
 
-        public virtual ShoppingCart? IDShoppingCartNavigation { get; set; }
         public virtual ICollection<Customer_Address> Customer_Addresses { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
+        public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; }
         public virtual ICollection<WishList> WishLists { get; set; }
     }
 }
