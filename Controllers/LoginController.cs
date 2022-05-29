@@ -1,222 +1,264 @@
 using Microsoft.AspNetCore.Mvc;
 using ZofyaApi.Models;
+using ZofyaApi.ModelValidations;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
-namespace ZofyaApi.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class LoginController : ControllerBase
+namespace ZofyaApi.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
+    public class LoginController : ControllerBase
+    {        
 
-    public class CustomerData {
-        public string Email { get; set; }
-        public string FullName { get; set; }
-        public string Password { get; set; }
-        public string RePassword { get; set; }
-        public string Phone { get; set; }
-        public string Agree {get; set;}
-    }
+        private ZofyaContext dbContext;
+        private Log log = new Log();
 
-    public class CustomerLogIn{
-        public string Email { get; set; }        
-        public string Password { get; set; }        
-    }
+        public LoginController(ZofyaContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
 
+        [HttpPost]
+        [Route("/Registration")]
+        public Result AddCustomer(CustomerData customerData)
+        {
 
-    public class Result {
-        public Boolean correct {get; set;}
-        public List<String>? message{get; set;}
-        public List<String>? field {get; set;}
-        public Customer? logInCustomer {get; set;}
-        
-    }
+            List<String> errorMessages = new List<String>();
 
-    private ZofyaContext dbContext;
-    private Log log = new Log();
-
-    public LoginController(ZofyaContext dbContext){
-        this.dbContext = dbContext;
-    }
-
-    [HttpPost]    
-    [Route("/Registration")]
-    public Result AddCustomer(CustomerData customerData) {
-
-        List<String> errorMessages = new List<String>();        
-
-        try
-        {               
-            Result result = new Result();
-
-            List<String> errorFields = new List<String>();
-
-            bool isCorrect = true;        
-            bool exist = dbContext.Customers.Where(c => c.Email.Equals(customerData.Email)).Count() > 0;
-            
-            if(exist)
+            try
             {
-                isCorrect = false;
-                result.correct = false;
-                errorMessages.Add("There is already an account registered with that email");
-                errorFields.Add("email");                
-            }
+                Result result = new Result();
 
-            string password = customerData.Password;
-            string rePassword = customerData.RePassword;
+                List<String> errorFields = new List<String>();
 
-            if(!(password.Equals(rePassword)))
-            {
-                isCorrect = false;                
-                result.correct = false;
-                errorMessages.Add("Passwords do not match");
-                errorFields.Add("rePassword");                
-            }           
+                bool isCorrect = true;
 
-            if(customerData.Agree.Equals("false"))
-            {
-                isCorrect = false;                
-                result.correct = false;
-                errorMessages.Add("It is necessary to accept the terms and conditions");
-                errorFields.Add("agree");                
-            }
+                // Basic fields validations
+                CustomerData customerDataValidation = new CustomerData();
 
-            if (isCorrect)
-            {                
+                Result emailResult = customerDataValidation.validateEmail(customerData.Email);
 
-                Customer customer = new Customer();
-                customer.Email = customerData.Email;
-                customer.FullName = customerData.FullName;
-                customer.Phone = customerData.Phone;                
+                if(!emailResult.correct){
+                    isCorrect = false;
+                    result.correct = false;
 
-                string customerPassword = Encrypt.GetSHA256(customerData.Password);
-                customer.Password = customerPassword;
+                    if(emailResult.message!=null){
+                        errorMessages.Add(emailResult.message[0]);
+                    }
+                   
+                    errorFields.Add("email");
+                }
 
-                dbContext.Customers.Add(customer);
-                dbContext.SaveChanges();
+                Result fullnameResult = customerDataValidation.validateFullname(customerData.FullName);
+
+                if(!fullnameResult.correct){
+                    isCorrect = false;
+                    result.correct = false;
+
+                    if(fullnameResult.message!=null){
+                        errorMessages.Add(fullnameResult.message[0]);
+                    }
+                   
+                    errorFields.Add("fullname");
+                }
+
+                Result passwordResult = customerDataValidation.validatePassword(customerData.Password);
+
+                if(!passwordResult.correct){
+                    isCorrect = false;
+                    result.correct = false;
+
+                    if(passwordResult.message!=null){
+                        errorMessages.Add(passwordResult.message[0]);
+                    }
+                   
+                    errorFields.Add("password");
+                }
+
+                Result phoneResult = customerDataValidation.validatePhone(customerData.Phone);
+
+                if(!phoneResult.correct){
+                    isCorrect = false;
+                    result.correct = false;
+
+                    if(phoneResult.message!=null){
+                        errorMessages.Add(phoneResult.message[0]);
+                    }
+                   
+                    errorFields.Add("phone");
+                }
+
                 
-                ShoppingCart shoppingCart = new ShoppingCart();
-                shoppingCart.IsEmpty = true;
-                shoppingCart.TotalBalance = 0;                                
+                bool exist = dbContext.Customers.Where(c => c.Email.Equals(customerData.Email)).Count() > 0;
 
-                var customerShoppingCart = (from cust in dbContext.Customers
-                                            where cust.Email == customerData.Email
-                                            select cust).FirstOrDefault();       
-                
-                if (customerShoppingCart != null)
+                if (exist)
                 {
-                    shoppingCart.IDUser = customerShoppingCart.IDUser;
+                    isCorrect = false;
+                    result.correct = false;
+                    errorMessages.Add("There is already an account registered with that email");
+                    errorFields.Add("email");
+                }
 
-                    WishList customerWishList = new WishList();
-                    customerWishList.Name = "Favorites";
-                    customerWishList.IDUser = customerShoppingCart.IDUser;
-                    
-                    dbContext.ShoppingCarts.Add(shoppingCart);
-                    dbContext.WishLists.Add(customerWishList);
+                string password = customerData.Password;
+                string rePassword = customerData.RePassword;
+
+                if (!(password.Equals(rePassword)))
+                {
+                    isCorrect = false;
+                    result.correct = false;
+                    errorMessages.Add("Passwords do not match");
+                    errorFields.Add("rePassword");
+                }
+
+                if ((customerData.Agree.Equals("false")) || ((customerData.Agree != "false") &&
+                    (customerData.Agree != "true")))
+                {
+                    isCorrect = false;
+                    result.correct = false;
+                    errorMessages.Add("It is necessary to accept the terms and conditions");
+                    errorFields.Add("agree");
+                }                
+
+                if (isCorrect)
+                {
+
+                    Customer customer = new Customer();
+                    customer.Email = customerData.Email;
+                    customer.FullName = customerData.FullName;
+                    customer.Phone = customerData.Phone;
+
+                    string customerPassword = Encrypt.GetSHA256(customerData.Password);
+                    customer.Password = customerPassword;
+
+                    dbContext.Customers.Add(customer);
                     dbContext.SaveChanges();
 
-                    List<String> successMessage = new List<String>();
-                    successMessage.Add("The account has been successfully registered");
+                    ShoppingCart shoppingCart = new ShoppingCart();
+                    shoppingCart.IsEmpty = true;
+                    shoppingCart.TotalBalance = 0;
 
-                    result.correct = true;  
-                    result.message = successMessage;
+                    var customerShoppingCart = (from cust in dbContext.Customers
+                                                where cust.Email == customerData.Email
+                                                select cust).FirstOrDefault();
+
+                    if (customerShoppingCart != null)
+                    {
+                        shoppingCart.IDUser = customerShoppingCart.IDUser;
+
+                        WishList customerWishList = new WishList();
+                        customerWishList.Name = "Favorites";
+                        customerWishList.IDUser = customerShoppingCart.IDUser;
+
+                        dbContext.ShoppingCarts.Add(shoppingCart);
+                        dbContext.WishLists.Add(customerWishList);
+                        dbContext.SaveChanges();
+
+                        List<String> successMessage = new List<String>();
+                        successMessage.Add("The account has been successfully registered");
+
+                        result.correct = true;
+                        result.message = successMessage;
+
+                    }
+                    else
+                    {
+                        result.correct = false;
+                    }
 
                 }
                 else
                 {
                     result.correct = false;
+                    result.message = errorMessages;
+                    result.field = errorFields;
                 }
-                
-            } 
-            else
+
+                return result;
+
+            }
+            catch (Exception e)
             {
-                result.correct = false;     
-                result.message = errorMessages;
-                result.field = errorFields;          
-            }            
-
-            return result;
-                        
-        }
-        catch (Exception e)
-        {                        
-            Result result = new Result();
-            result.correct = false;
-
-            errorMessages.Clear();            
-            log.Add(e.ToString());          
-            errorMessages.Add("Internal Server Error");            
-
-            result.message = errorMessages;        
-            return result;            
-        }
-        
-    }
-
-    [HttpPost]    
-    [Route("/LogIn")]
-    public Result LogIn(CustomerLogIn customerLogIn) {
-
-        List<String> errorMessages = new List<String>();        
-
-        try
-        {               
-            Result result = new Result();            
-
-            bool isCorrect = true;      
-
-            string customerPassword = Encrypt.GetSHA256(customerLogIn.Password);  
-            
-            bool existEmail = dbContext.Customers.Where(c => c.Email == customerLogIn.Email &&
-                                                            c.Password == customerPassword).Count() > 0;
-                                                
-            if (!existEmail)
-            {
-                isCorrect = false;
+                Result result = new Result();
                 result.correct = false;
-                errorMessages.Add("Invalid nickname and/or password");
-            }                                                  
 
-            if (isCorrect)
+                errorMessages.Clear();
+                log.Add(e.ToString());
+                errorMessages.Add("Internal Server Error");
+
+                result.message = errorMessages;
+                return result;
+            }
+
+        }        
+
+        [HttpPost]
+        [Route("/LogIn")]
+        public Result LogIn(CustomerLogIn customerLogIn)
+        {
+
+            List<String> errorMessages = new List<String>();
+
+            try
             {
+                Result result = new Result();
 
-                var customer = (from cust in dbContext.Customers
-                               where cust.Email == customerLogIn.Email
-                               select cust).FirstOrDefault();                                                
+                bool isCorrect = true;
 
-                result.correct = true;           
+                string customerPassword = Encrypt.GetSHA256(customerLogIn.Password);
 
-                List<String> successMessage = new List<String>();
-                successMessage.Add("Successful login");
-                result.message = successMessage;
+                bool existEmail = dbContext.Customers.Where(c => c.Email == customerLogIn.Email &&
+                                                                c.Password == customerPassword).Count() > 0;
 
-                result.logInCustomer = customer;       
+                if (!existEmail)
+                {
+                    isCorrect = false;
+                    result.correct = false;
+                    errorMessages.Add("Invalid nickname and/or password");
+                }
+
+                if (isCorrect)
+                {
+
+                    var customer = (from cust in dbContext.Customers
+                                    where cust.Email == customerLogIn.Email
+                                    select cust).FirstOrDefault();
+
+                    result.correct = true;
+
+                    List<String> successMessage = new List<String>();
+                    successMessage.Add("Successful login");
+                    result.message = successMessage;
+
+                    result.logInCustomer = customer;
 
 
-            } 
-            else
+                }
+                else
+                {
+                    result.correct = false;
+                    result.message = errorMessages;
+                }
+
+                return result;
+
+            }
+            catch (Exception e)
             {
-                result.correct = false;     
-                result.message = errorMessages;                          
-            }            
+                Result result = new Result();
+                result.correct = false;
 
-            return result;
-                        
+                errorMessages.Clear();
+                log.Add(e.ToString());
+                errorMessages.Add("Internal Server Error");
+
+                result.message = errorMessages;
+                return result;
+            }
+
         }
-        catch (Exception e)
-        {                        
-            Result result = new Result();
-            result.correct = false;
 
-            errorMessages.Clear();
-            log.Add(e.ToString());          
-            errorMessages.Add("Internal Server Error");           
-
-            result.message = errorMessages;        
-            return result;            
-        }
-        
     }
-
 }
+
