@@ -10,7 +10,7 @@ namespace ZofyaApi.Controllers
     [ApiController]
     [Route("[controller]")]
     public class LoginController : ControllerBase
-    {        
+    {
 
         private ZofyaContext dbContext;
         private Log log = new Log();
@@ -40,57 +40,65 @@ namespace ZofyaApi.Controllers
 
                 Result emailResult = customerDataValidation.validateEmail(customerData.Email);
 
-                if(!emailResult.correct){
+                if (!emailResult.correct)
+                {
                     isCorrect = false;
                     result.correct = false;
 
-                    if(emailResult.message!=null){
+                    if (emailResult.message != null)
+                    {
                         errorMessages.Add(emailResult.message[0]);
                     }
-                   
+
                     errorFields.Add("email");
                 }
 
                 Result fullnameResult = customerDataValidation.validateFullname(customerData.FullName);
 
-                if(!fullnameResult.correct){
+                if (!fullnameResult.correct)
+                {
                     isCorrect = false;
                     result.correct = false;
 
-                    if(fullnameResult.message!=null){
+                    if (fullnameResult.message != null)
+                    {
                         errorMessages.Add(fullnameResult.message[0]);
                     }
-                   
+
                     errorFields.Add("fullname");
                 }
 
                 Result passwordResult = customerDataValidation.validatePassword(customerData.Password);
 
-                if(!passwordResult.correct){
+                if (!passwordResult.correct)
+                {
                     isCorrect = false;
                     result.correct = false;
 
-                    if(passwordResult.message!=null){
+                    if (passwordResult.message != null)
+                    {
                         errorMessages.Add(passwordResult.message[0]);
                     }
-                   
+
                     errorFields.Add("password");
                 }
 
                 Result phoneResult = customerDataValidation.validatePhone(customerData.Phone);
 
-                if(!phoneResult.correct){
+                if (!phoneResult.correct)
+                {
                     isCorrect = false;
                     result.correct = false;
 
-                    if(phoneResult.message!=null){
+                    if (phoneResult.message != null)
+                    {
                         errorMessages.Add(phoneResult.message[0]);
                     }
-                   
+
                     errorFields.Add("phone");
                 }
 
-                
+
                 bool exist = dbContext.Customers.Where(c => c.Email.Equals(customerData.Email)).Count() > 0;
 
                 if (exist)
@@ -119,7 +127,7 @@ namespace ZofyaApi.Controllers
                     result.correct = false;
                     errorMessages.Add("It is necessary to accept the terms and conditions");
                     errorFields.Add("agree");
-                }                
+                }
 
                 if (isCorrect)
                 {
@@ -191,73 +199,136 @@ namespace ZofyaApi.Controllers
                 return result;
             }
 
-        }        
+        }
+
+
+        // [HttpPost]
+        // [Route("/LogIn")]
+        // public Result LogIn(CustomerLogIn customerLogIn)
+        // {
+
+        //     List<String> errorMessages = new List<String>();
+
+        //     try
+        //     {
+        //         Result result = new Result();
+
+        //         bool isCorrect = true;
+
+        //         string customerPassword = Encrypt.GetSHA256(customerLogIn.Password);
+
+        //         bool existEmail = dbContext.Customers.Where(c => c.Email == customerLogIn.Email &&
+        //                                                         c.Password == customerPassword).Count() > 0;
+
+        //         if (!existEmail)
+        //         {
+        //             isCorrect = false;
+        //             result.correct = false;
+        //             errorMessages.Add("Invalid nickname and/or password");
+        //         }
+
+        //         if (isCorrect)
+        //         {
+
+        //             var customer = (from cust in dbContext.Customers
+        //                             where cust.Email == customerLogIn.Email
+        //                             select cust).FirstOrDefault();
+
+        //             result.correct = true;
+
+        //             List<String> successMessage = new List<String>();
+        //             successMessage.Add("Successful login");
+        //             result.message = successMessage;
+
+        //             result.logInCustomer = customer;
+
+
+        //         }
+        //         else
+        //         {
+        //             result.correct = false;
+        //             result.message = errorMessages;
+        //         }
+
+        //         return result;
+
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Result result = new Result();
+        //         result.correct = false;
+
+        //         errorMessages.Clear();
+        //         log.Add(e.ToString());
+        //         errorMessages.Add("Internal Server Error");
+
+        //         result.message = errorMessages;
+        //         return result;
+        //     }
+
+        // }        
+
+        // [HttpGet] 
+        // [Route("/UserShoppingCart/{idUser}")]
+        // public ShoppingCart GetUserShoppingCart(string idUser)
+        // {
+
+
+        //     ShoppingCart? shoppingCart = (from sc in dbContext.ShoppingCarts
+        //                                     where sc.IDUser == Int32.Parse(idUser)
+        //                                     select sc).FirstOrDefault();
+
+        //     return shoppingCart;            
+        // }
+
+        // [HttpGet] 
+        // [Route("/ShoppingCartProductsNumber/{idShoppingCart}")]
+        // public int GetShoppingCartProductsNumber(int idShoppingCart)
+        // {
+
+        //     List<ItemShoppingCart> itemShoppingCarts = (from isc in dbContext.ItemShoppingCarts
+        //                                                 where isc.IDShoppingCart == idShoppingCart
+        //                                                 select isc).ToList();
+
+        //     return itemShoppingCarts.Count();
+
+        // }
 
         [HttpPost]
-        [Route("/LogIn")]
-        public Result LogIn(CustomerLogIn customerLogIn)
+        [Route("/PostUserShoppingCart")]
+        public ShoppingCart PostUserShoppingCart(IDResult idUser)
         {
 
-            List<String> errorMessages = new List<String>();
+            ShoppingCart? shoppingCart = (from sc in dbContext.ShoppingCarts
+                                          where sc.IDUser == Int32.Parse(idUser.ID)
+                                          select sc).FirstOrDefault();
 
-            try
-            {
-                Result result = new Result();
-
-                bool isCorrect = true;
-
-                string customerPassword = Encrypt.GetSHA256(customerLogIn.Password);
-
-                bool existEmail = dbContext.Customers.Where(c => c.Email == customerLogIn.Email &&
-                                                                c.Password == customerPassword).Count() > 0;
-
-                if (!existEmail)
-                {
-                    isCorrect = false;
-                    result.correct = false;
-                    errorMessages.Add("Invalid nickname and/or password");
-                }
-
-                if (isCorrect)
-                {
-
-                    var customer = (from cust in dbContext.Customers
-                                    where cust.Email == customerLogIn.Email
-                                    select cust).FirstOrDefault();
-
-                    result.correct = true;
-
-                    List<String> successMessage = new List<String>();
-                    successMessage.Add("Successful login");
-                    result.message = successMessage;
-
-                    result.logInCustomer = customer;
-
-
-                }
-                else
-                {
-                    result.correct = false;
-                    result.message = errorMessages;
-                }
-
-                return result;
-
-            }
-            catch (Exception e)
-            {
-                Result result = new Result();
-                result.correct = false;
-
-                errorMessages.Clear();
-                log.Add(e.ToString());
-                errorMessages.Add("Internal Server Error");
-
-                result.message = errorMessages;
-                return result;
-            }
+            return shoppingCart;
 
         }
+
+        [HttpPost]
+        [Route("/PostShoppingCartProductsNumber")]
+        public int PostShoppingCartProductsNumber(IDResult idShoppingCart)
+        {
+           
+            List<ItemShoppingCart> itemShoppingCarts = (from isc in dbContext.ItemShoppingCarts
+                                                        where isc.IDShoppingCart == Int32.Parse(idShoppingCart.ID)
+                                                        select isc).ToList();
+
+            return itemShoppingCarts.Count();
+            
+        }
+
+        [HttpPost]
+        [Route("/PostFindCustomer")]
+        public Customer? PostFindCustomer(AuxiliaryUser auxiliaryUser)
+        {                         
+            return dbContext.Customers.Where(c => c.Email == auxiliaryUser.Email &&
+                                             c.Password == auxiliaryUser.Password).FirstOrDefault();                      
+        }                        
+
+
 
     }
 }
