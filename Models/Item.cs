@@ -13,12 +13,14 @@ namespace ZofyaApi.Models
 
         public string SKU { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public double Discount { get; set; }
+        public decimal Discount { get; set; }
         public string Name { get; set; } = null!;
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         public string Category { get; set; } = null!;
+        public string Gender { get; set; } = null!;
         public string Status { get; set; } = null!;
         public int Stock { get; set; }
+        public string Care { get; set; } = null!;
 
         public virtual ICollection<ItemShoppingCart> ItemShoppingCarts { get; set; }
         public virtual ICollection<Item_WishList> Item_WishLists { get; set; }
