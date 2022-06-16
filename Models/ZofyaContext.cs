@@ -126,6 +126,8 @@ namespace ZofyaApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Care).IsUnicode(false);
+
                 entity.Property(e => e.Category)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -135,6 +137,10 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Discount).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
@@ -324,7 +330,7 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .HasMaxLength(50)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Phone)

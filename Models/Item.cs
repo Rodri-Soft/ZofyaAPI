@@ -19,6 +19,8 @@ namespace ZofyaApi.Models
         public string Category { get; set; } = null!;
         public string Status { get; set; } = null!;
         public int Stock { get; set; }
+        public string Gender { get; set; } = null!;
+        public string Care { get; set; } = null!;
 
         public virtual ICollection<ItemShoppingCart> ItemShoppingCarts { get; set; }
         public virtual ICollection<Item_WishList> Item_WishLists { get; set; }
