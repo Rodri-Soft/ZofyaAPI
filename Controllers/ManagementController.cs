@@ -33,8 +33,470 @@ namespace ZofyaApi.Controllers
         public staff? PostFindStaffEmail(IDResult idEmail)
         {
             return dbContext.staff.Where(s => s.Email == idEmail.ID).FirstOrDefault();
-        }        
-        
+        }            
+
+        [HttpPut]
+        [Route("/UpdateAdministrator")]
+        public Result UpdateAdministrator(AuxiliaryStaff auxiliaryStaff)
+        {
+
+            List<String> errorMessages = new List<String>();            
+            Result result = new Result();
+            List<String> errorFields = new List<String>();
+            StaffData staffData = new StaffData();            
+            
+            switch (auxiliaryStaff.Field)
+            {
+
+                case "rfc":                                                   
+                                        
+                    
+                    Result rfcResult = staffData.validateRFC(auxiliaryStaff.Value);
+
+                    if (!rfcResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (rfcResult.message != null)
+                        {
+                            errorMessages.Add(rfcResult.message[0]);
+                        }
+
+                        errorFields.Add("rfc");
+
+                        break;
+                    }
+
+                    try
+                    {
+                        bool exist = dbContext.staff.Where(st => st.RFC.Equals(auxiliaryStaff.Value)).Count() > 0;
+
+                        if (exist)
+                        {
+                            
+                            result.correct = false;
+                            errorMessages.Add("There is already an account registered with that RFC");
+                            errorFields.Add("rfc");
+
+                            break;
+                        }                                        
+                                            
+                        var staffDB = dbContext.staff.FirstOrDefault(
+                            s => s.RFC.Equals(auxiliaryStaff.PrimaryKeyRFC));
+
+                        if (staffDB != null)
+                        {
+
+                            dbContext.Remove(staffDB);
+                            dbContext.SaveChanges();
+                            
+                            staffDB.RFC = auxiliaryStaff.Value;                           
+
+                            dbContext.staff.Add(staffDB);                            
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The RFC has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No admin found with that RFC");
+                            errorFields.Add("rfc");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+                    
+                
+                case "curp":             
+
+                    
+                    Result curpResult = staffData.validateCURP(auxiliaryStaff.Value);
+
+                    if (!curpResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (curpResult.message != null)
+                        {
+                            errorMessages.Add(curpResult.message[0]);
+                        }
+
+                        errorFields.Add("curp");
+
+                        break;
+                    }
+
+                    try
+                    {                                                          
+                                            
+                        var staffDB = dbContext.staff.FirstOrDefault(
+                            s => s.RFC.Equals(auxiliaryStaff.PrimaryKeyRFC));
+
+                        if (staffDB != null)
+                        {                            
+                            
+                            staffDB.CURP = auxiliaryStaff.Value;                           
+                            
+                            dbContext.staff.Update(staffDB);
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The CURP has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No admin found with that RFC");
+                            errorFields.Add("rfc");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+
+                case "email":             
+
+                    
+                    Result emailResult = staffData.validateEmail(auxiliaryStaff.Value);
+
+                    if (!emailResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (emailResult.message != null)
+                        {
+                            errorMessages.Add(emailResult.message[0]);
+                        }
+
+                        errorFields.Add("email");
+
+                        break;
+                    }
+
+                    try
+                    {                  
+                        bool exist = dbContext.staff.Where(st => st.Email.Equals(auxiliaryStaff.Value)).Count() > 0;
+
+                        if (exist)
+                        {
+                            
+                            result.correct = false;
+                            errorMessages.Add("There is already an account registered with that Email");
+                            errorFields.Add("email");
+
+                            break;
+                        }                                                 
+                                            
+                        var staffDB = dbContext.staff.FirstOrDefault(
+                            s => s.RFC.Equals(auxiliaryStaff.PrimaryKeyRFC));
+
+                        if (staffDB != null)
+                        {                            
+                            
+                            staffDB.Email = auxiliaryStaff.Value;                           
+                            
+                            dbContext.staff.Update(staffDB);
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The Email has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No admin found with that RFC");
+                            errorFields.Add("rfc");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+
+                
+                case "fullname":             
+
+                    
+                    Result fullnameResult = staffData.validateFullname(auxiliaryStaff.Value);
+
+                    if (!fullnameResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (fullnameResult.message != null)
+                        {
+                            errorMessages.Add(fullnameResult.message[0]);
+                        }
+
+                        errorFields.Add("fullname");
+
+                        break;
+                    }
+
+                    try
+                    {                                                          
+                                            
+                        var staffDB = dbContext.staff.FirstOrDefault(
+                            s => s.RFC.Equals(auxiliaryStaff.PrimaryKeyRFC));
+
+                        if (staffDB != null)
+                        {                            
+                            
+                            staffDB.FullName = auxiliaryStaff.Value;                           
+                            
+                            dbContext.staff.Update(staffDB);
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The Fullname has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No admin found with that RFC");
+                            errorFields.Add("rfc");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+
+                case "phone":             
+
+                    
+                    Result phoneResult = staffData.validatePhone(auxiliaryStaff.Value);
+
+                    if (!phoneResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (phoneResult.message != null)
+                        {
+                            errorMessages.Add(phoneResult.message[0]);
+                        }
+
+                        errorFields.Add("phone");
+
+                        break;
+                    }
+
+                    try
+                    {                                                          
+                                            
+                        var staffDB = dbContext.staff.FirstOrDefault(
+                            s => s.RFC.Equals(auxiliaryStaff.PrimaryKeyRFC));
+
+                        if (staffDB != null)
+                        {                            
+                            
+                            staffDB.Phone = auxiliaryStaff.Value;                           
+                            
+                            dbContext.staff.Update(staffDB);
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The Phone has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No admin found with that RFC");
+                            errorFields.Add("rfc");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+
+                default:
+                    break;
+            }
+
+            result.message = errorMessages;
+            result.field = errorFields;
+
+            return result;
+          
+        }
+
+
+        [HttpPut]
+        [Route("/UpdateAdministratorPassword")]
+        public Result UpdateAdministratorPassword(AuxiliaryStaffPassword auxiliaryStaffPassword)
+        {
+
+            List<String> errorMessages = new List<String>();
+            Result result = new Result();
+            List<String> errorFields = new List<String>();
+            StaffData staffData = new StaffData();     
+
+            try
+            {
+
+                var staffDB = dbContext.staff.FirstOrDefault(
+                        s => s.RFC.Equals(auxiliaryStaffPassword.PrimaryKeyRFC));
+
+                if (staffDB == null)
+                {
+                    
+                    result.correct = false;
+                    errorMessages.Add("No admin found with that RFC");
+                    errorFields.Add("rfc");
+                    
+                    result.message = errorMessages;
+                    result.field = errorFields;
+
+                    return result;
+
+                }
+
+                string currentPassword = Encrypt.GetSHA256(auxiliaryStaffPassword.CurrentValue);
+                
+                if (!(currentPassword.Equals(staffDB.Password)))
+                {
+
+                    result.correct = false;
+                    errorMessages.Add("Wrong current password");
+                    errorFields.Add("password");
+                    
+                    result.message = errorMessages;
+                    result.field = errorFields;
+
+                    return result;
+
+                }
+                
+                Result passwordResult = staffData.validatePassword(auxiliaryStaffPassword.NewValue);
+
+                if (!passwordResult.correct)
+                {
+
+                    result.correct = false;
+
+                    if (passwordResult.message != null)
+                    {
+                        errorMessages.Add(passwordResult.message[0]);
+                    }
+
+                    errorFields.Add("password");
+
+                    result.message = errorMessages;
+                    result.field = errorFields;
+
+                    return result;
+                }
+
+                string newPassword = Encrypt.GetSHA256(auxiliaryStaffPassword.NewValue);
+                staffDB.Password = newPassword;
+
+                dbContext.staff.Update(staffDB);
+                dbContext.SaveChanges();
+
+                List<String> successMessage = new List<String>();
+                successMessage.Add("The Password has been successfully updated");
+
+                result.correct = true;
+                result.message = successMessage;
+                return result;
+                                
+            }
+            catch (Exception e)
+            {
+                Result exceptionResult = new Result();
+                exceptionResult.correct = false;
+
+                errorMessages.Clear();
+                log.Add(e.ToString());
+                errorMessages.Add("Internal Server Error");
+
+                exceptionResult.message = errorMessages;
+                return exceptionResult;
+            }
+
+
+        }
 
 
 

@@ -199,74 +199,7 @@ namespace ZofyaApi.Controllers
                 return result;
             }
 
-        }
-
-
-        // [HttpPost]
-        // [Route("/LogIn")]
-        // public Result LogIn(CustomerLogIn customerLogIn)
-        // {
-
-        //     List<String> errorMessages = new List<String>();
-
-        //     try
-        //     {
-        //         Result result = new Result();
-
-        //         bool isCorrect = true;
-
-        //         string customerPassword = Encrypt.GetSHA256(customerLogIn.Password);
-
-        //         bool existEmail = dbContext.Customers.Where(c => c.Email == customerLogIn.Email &&
-        //                                                         c.Password == customerPassword).Count() > 0;
-
-        //         if (!existEmail)
-        //         {
-        //             isCorrect = false;
-        //             result.correct = false;
-        //             errorMessages.Add("Invalid nickname and/or password");
-        //         }
-
-        //         if (isCorrect)
-        //         {
-
-        //             var customer = (from cust in dbContext.Customers
-        //                             where cust.Email == customerLogIn.Email
-        //                             select cust).FirstOrDefault();
-
-        //             result.correct = true;
-
-        //             List<String> successMessage = new List<String>();
-        //             successMessage.Add("Successful login");
-        //             result.message = successMessage;
-
-        //             result.logInCustomer = customer;
-
-
-        //         }
-        //         else
-        //         {
-        //             result.correct = false;
-        //             result.message = errorMessages;
-        //         }
-
-        //         return result;
-
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Result result = new Result();
-        //         result.correct = false;
-
-        //         errorMessages.Clear();
-        //         log.Add(e.ToString());
-        //         errorMessages.Add("Internal Server Error");
-
-        //         result.message = errorMessages;
-        //         return result;
-        //     }
-
-        // }        
+        }              
 
         // [HttpGet] 
         // [Route("/UserShoppingCart/{idUser}")]
@@ -326,9 +259,9 @@ namespace ZofyaApi.Controllers
         {                         
             return dbContext.Customers.Where(c => c.Email == auxiliaryUser.Email &&
                                              c.Password == auxiliaryUser.Password).FirstOrDefault();                      
-        }                        
+        }
 
-
+        
 
     }
 }

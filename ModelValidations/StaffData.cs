@@ -3,14 +3,105 @@ using System.Text.RegularExpressions;
 
 namespace ZofyaApi.ModelValidations
 {
-    public class CustomerData {
-        
-        public string Email { get; set; }
-        public string FullName { get; set; }
-        public string Password { get; set; }
-        public string RePassword { get; set; }
-        public string Phone { get; set; }
-        public string Agree {get; set;}
+    public class StaffData {
+
+        public string RFC { get; set; } = null!;
+        public string CURP { get; set; } = null!;
+        public string Rol { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string FullName { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string Phone { get; set; } = null!;
+
+        public Result validateRFC(string rfc)
+        {
+            Result rfcResult = new Result();
+            List<String> errorMessage = new List<String>();
+            bool requiredValidation = string.IsNullOrEmpty(rfc);
+
+            if (requiredValidation)
+            {
+                rfcResult.correct = false;
+                errorMessage.Add("RFC Field Required");
+                rfcResult.message = errorMessage;
+
+                return rfcResult;
+            }
+
+            int lengthValidation = rfc.Length;
+            const int MAX_LENGTH = 13;
+
+            if (lengthValidation > MAX_LENGTH)
+            {
+                rfcResult.correct = false;
+                errorMessage.Add("Maximum length of 13 characters");
+                rfcResult.message = errorMessage;
+
+                return rfcResult;
+            }
+
+            string pattern = @"^([A-ZÑ&]{3,4}) ?(?:- ?)?(\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])) ?(?:- ?)?([A-Z\d]{2})([A\d])$";
+            bool patternValidation = Regex.IsMatch(rfc, pattern);
+
+            if (!patternValidation)
+            {
+
+                rfcResult.correct = false;
+                errorMessage.Add("Invalid RFC Format.");
+                rfcResult.message = errorMessage;
+
+                return rfcResult;
+            }
+
+            rfcResult.correct = true;
+            return rfcResult;
+
+        }
+
+        public Result validateCURP(string curp)
+        {
+            Result curpResult = new Result();
+            List<String> errorMessage = new List<String>();
+            bool requiredValidation = string.IsNullOrEmpty(curp);
+
+            if (requiredValidation)
+            {
+                curpResult.correct = false;
+                errorMessage.Add("CURP Field Required");
+                curpResult.message = errorMessage;
+
+                return curpResult;
+            }
+
+            int lengthValidation = curp.Length;
+            const int MAX_LENGTH = 18;
+
+            if (lengthValidation > MAX_LENGTH)
+            {
+                curpResult.correct = false;
+                errorMessage.Add("Maximum length of 18 characters");
+                curpResult.message = errorMessage;
+
+                return curpResult;
+            }
+
+            string pattern = @"^([A-Z][AEIOUX][A-Z]{2}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\d])(\d)$";
+            bool patternValidation = Regex.IsMatch(curp, pattern);
+
+            if (!patternValidation)
+            {
+
+                curpResult.correct = false;
+                errorMessage.Add("Invalid CURP Format.");
+                curpResult.message = errorMessage;
+
+                return curpResult;
+            }
+
+            curpResult.correct = true;
+            return curpResult;
+
+        }
 
         public Result validateEmail(string email)
         {
@@ -66,7 +157,7 @@ namespace ZofyaApi.ModelValidations
             if (requiredValidation)
             {
                 fullnameResult.correct = false;
-                errorMessage.Add("Full Name Field Required");
+                errorMessage.Add("Fullname Field Required");
                 fullnameResult.message = errorMessage;
 
                 return fullnameResult;
@@ -91,7 +182,7 @@ namespace ZofyaApi.ModelValidations
             {
 
                 fullnameResult.correct = false;
-                errorMessage.Add("Invalid Full Name Format.");
+                errorMessage.Add("Invalid Fullname Format.");
                 fullnameResult.message = errorMessage;
 
                 return fullnameResult;
@@ -138,8 +229,7 @@ namespace ZofyaApi.ModelValidations
                                 
                 return passwordResult;
             }
-
-            // string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&#.$($)$-$_])[A-Za-z\d$@$!%*?&#.$($)$-$_]{8,16}$";
+            
             string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&#.$($)$-$_])[A-Za-zÀ-ÿ\\u00f1\\u00d1\d$@$!%*?&#.$($)$-$_]{8,16}$";
             bool patternValidation = Regex.IsMatch(password, pattern);
 
