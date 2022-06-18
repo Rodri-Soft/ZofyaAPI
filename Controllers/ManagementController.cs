@@ -498,7 +498,122 @@ namespace ZofyaApi.Controllers
 
         }
 
+        [HttpPost]
+        [Route("/CustomersData")]
+        public List<AuxiliaryCustomer> GetCustomersData() {
+            
+            return dbContext.Customers.Select(c => new AuxiliaryCustomer(){IDUser = c.IDUser,
+                                                                FullName = c.FullName,
+                                                                Email = c.Email,
+                                                                Phone = c.Phone})
+                                                                .ToList();                                                                            
+        }
 
+        [HttpPost]
+        [Route("/ItemsData")]
+        public List<AuxiliaryAdministrationItem> GetItemsData() {
+            
+            return dbContext.Items.Select(i => new AuxiliaryAdministrationItem(){SKU = i.SKU,
+                                                                Description = i.Description,
+                                                                Name = i.Name,
+                                                                Price = i.Price,
+                                                                Category = i.Category,
+                                                                Status = i.Status,
+                                                                Stock = i.Stock,
+                                                                Gender = i.Gender,
+                                                                Care = i.Care})
+                                                                .ToList();                                                                            
+        }
+
+        [HttpDelete("/CustomerDelete/{email}")]
+        public Result DeleteCustomer(String email)
+        {
+            Result result = new Result();
+            List<String> errorMessages = new List<String>();
+            try
+            {
+                var customerBD = dbContext.Customers.FirstOrDefault(c => c.Email.Equals(email));
+
+                if (customerBD != null)
+                {
+                    dbContext.Remove(customerBD);
+                    dbContext.SaveChanges();
+
+                    List<String> successMessage = new List<String>();
+                    successMessage.Add("The customer has been successfully deleted");
+
+                    result.correct = true;
+                    result.message = successMessage;
+
+                    return result;
+                }
+                else
+                {
+                    result.correct = false;                    
+                    errorMessages.Add("The customer does not exist in the DB");
+                    result.message = errorMessages;
+
+                    return result;
+                }
+            }
+            catch (Exception e)
+            {
+                Result exceptionResult = new Result();
+                exceptionResult.correct = false;
+
+                errorMessages.Clear();
+                log.Add(e.ToString());
+                errorMessages.Add("Internal Server Error");
+
+                exceptionResult.message = errorMessages;
+                return exceptionResult;
+            }
+        }
+
+        [HttpDelete("/ItemDelete/{sku}")]
+        public Result DeleteItem(String sku)
+        {
+            Result result = new Result();
+            List<String> errorMessages = new List<String>();
+            try
+            {
+                var itemBD = dbContext.Items.FirstOrDefault(i => i.SKU.Equals(sku));
+
+                if (itemBD != null)
+                {
+                    dbContext.Remove(itemBD);
+                    dbContext.SaveChanges();
+
+                    List<String> successMessage = new List<String>();
+                    successMessage.Add("The item has been successfully deleted");
+
+                    result.correct = true;
+                    result.message = successMessage;
+
+                    return result;
+                }
+                else
+                {
+                    result.correct = false;                    
+                    errorMessages.Add("The item does not exist in the DB");
+                    result.message = errorMessages;
+
+                    return result;
+                }
+            }
+            catch (Exception e)
+            {
+                Result exceptionResult = new Result();
+                exceptionResult.correct = false;
+
+                errorMessages.Clear();
+                log.Add(e.ToString());
+                errorMessages.Add("Internal Server Error");
+
+                exceptionResult.message = errorMessages;
+                return exceptionResult;
+            }
+        }
 
     }
 }
