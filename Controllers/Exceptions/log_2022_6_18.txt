@@ -1,0 +1,10 @@
+18/06/2022 09:39:12 - System.InvalidOperationException: Unable to track an instance of type 'Item_Color' because it does not have a primary key. Only entity types with a primary key may be tracked.
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.GetOrCreateEntry(Object entity, IEntityType entityType)
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.EntryWithoutDetectChanges(TEntity entity)
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.Add(TEntity entity)
+   at ZofyaApi.Controllers.ManagementController.AddItem(AuxiliaryAdministrationAddItem auxiliaryAdministrationAddItem) in C:\Users\Rodrigo Sanchez\OneDrive - Universidad Veracruzana\Documentos\SextoSemestre\Desarrollo de sistemas en red\Proyecto\ZofyaApi\Controllers\ManagementController.cs:line 792
+18/06/2022 10:02:53 - System.InvalidOperationException: Unable to track an instance of type 'Item_Color' because it does not have a primary key. Only entity types with a primary key may be tracked.
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.GetOrCreateEntry(Object entity, IEntityType entityType)
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.EntryWithoutDetectChanges(TEntity entity)
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.Add(TEntity entity)
+   at ZofyaApi.Controllers.ManagementController.AddItem(AuxiliaryAdministrationAddItem auxiliaryAdministrationAddItem) in C:\Users\Rodrigo Sanchez\OneDrive - Universidad Veracruzana\Documentos\SextoSemestre\Desarrollo de sistemas en red\Proyecto\ZofyaApi\Controllers\ManagementController.cs:line 792

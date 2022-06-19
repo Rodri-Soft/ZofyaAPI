@@ -2,7 +2,7 @@ public class AuxiliaryItem
 {
   public string SKU { get; set; } = null!;
   public string Description { get; set; } = null!;
-  public decimal Discount { get; set; }
+  public decimal? Discount { get; set; }
   public string Name { get; set; } = null!;
   public decimal Price { get; set; }
   public string Category { get; set; } = null!;

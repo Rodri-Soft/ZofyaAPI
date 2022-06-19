@@ -199,33 +199,7 @@ namespace ZofyaApi.Controllers
                 return result;
             }
 
-        }              
-
-        // [HttpGet] 
-        // [Route("/UserShoppingCart/{idUser}")]
-        // public ShoppingCart GetUserShoppingCart(string idUser)
-        // {
-
-
-        //     ShoppingCart? shoppingCart = (from sc in dbContext.ShoppingCarts
-        //                                     where sc.IDUser == Int32.Parse(idUser)
-        //                                     select sc).FirstOrDefault();
-
-        //     return shoppingCart;            
-        // }
-
-        // [HttpGet] 
-        // [Route("/ShoppingCartProductsNumber/{idShoppingCart}")]
-        // public int GetShoppingCartProductsNumber(int idShoppingCart)
-        // {
-
-        //     List<ItemShoppingCart> itemShoppingCarts = (from isc in dbContext.ItemShoppingCarts
-        //                                                 where isc.IDShoppingCart == idShoppingCart
-        //                                                 select isc).ToList();
-
-        //     return itemShoppingCarts.Count();
-
-        // }
+        }                      
 
         [HttpPost]
         [Route("/PostUserShoppingCart")]
