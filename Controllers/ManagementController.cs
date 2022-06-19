@@ -556,6 +556,20 @@ namespace ZofyaApi.Controllers
         }
 
         [HttpPost]
+        [Route("/OrdersData")]
+        public List<AuxiliaryOrder> GetOrdersData() {
+            
+            return dbContext.Orders.Select(o => new AuxiliaryOrder(){IDOrder = o.IDOrder,
+                                                                Date = o.Date,
+                                                                DeliveryDate = o.DeliveryDate,
+                                                                Status = o.Status,
+                                                                TotalToPay = o.TotalToPay,
+                                                                IDUser = o.IDUser,                                                                                                                                
+                                                                })
+                                                                .ToList();                                                                            
+        }
+
+        [HttpPost]
         [Route("/ItemsData")]
         public List<AuxiliaryAdministrationItem> GetItemsData() {
             
@@ -691,6 +705,58 @@ namespace ZofyaApi.Controllers
                 {
                     result.correct = false;                    
                     errorMessages.Add("The item does not exist in the DB");
+                    result.message = errorMessages;
+
+                    return result;
+                }
+            }
+            catch (Exception e)
+            {
+                Result exceptionResult = new Result();
+                exceptionResult.correct = false;
+
+                errorMessages.Clear();
+                log.Add(e.ToString());
+                errorMessages.Add("Internal Server Error");
+
+                exceptionResult.message = errorMessages;
+                return exceptionResult;
+            }
+
+
+        }
+
+        [HttpPatch]
+        [Route("/UpdateOrder")]
+        public Result UpdateOrder(AuxiliaryOrderUpdate order)
+        {
+
+            Result result = new Result();
+            List<String> errorMessages = new List<String>();
+            try
+            {
+                var idOrder = int.Parse(order.IDOrder);
+                var orderBD = dbContext.Orders.FirstOrDefault(o => o.IDOrder == idOrder);
+
+                if (orderBD != null)
+                {
+                    orderBD.Status = order.Status;
+                    
+                    dbContext.Orders.Update(orderBD);
+                    dbContext.SaveChanges();
+
+                    List<String> successMessage = new List<String>();
+                    successMessage.Add("The order has been successfully updated");
+
+                    result.correct = true;
+                    result.message = successMessage;
+
+                    return result;
+                }
+                else
+                {
+                    result.correct = false;                    
+                    errorMessages.Add("The order does not exist in the DB");
                     result.message = errorMessages;
 
                     return result;
@@ -1077,6 +1143,45 @@ namespace ZofyaApi.Controllers
             }
 
         } 
+
+        [HttpGet]
+        [Route("/PopularItems")]
+        public List<PopularItem> GetPopularItems()
+        {
+            List<PopularItem> popularItems = new List<PopularItem>(); 
+            double totalPortion = 0;
+            
+            foreach(var line in dbContext.ItemShoppingCarts.GroupBy(info => info.SKU)
+                                    .Select(group => new { 
+                                        Metric = group.Key, 
+                                        Count = group.Count() 
+                                    })
+                                    .OrderBy(x => x.Metric))
+            {                
+
+                totalPortion += line.Count;
+                
+                PopularItem popularItem = new PopularItem();
+                popularItem.Name = line.Metric;
+                popularItem.Y = line.Count;
+                popularItem.Sliced = false;
+                popularItem.Selected = false;
+                
+                popularItems.Add(popularItem);                
+            }
+
+            foreach (var popularItem in popularItems)
+            {
+                var item = dbContext.Items.Where(i => i.SKU == popularItem.Name).FirstOrDefault();  
+                popularItem.Name = item.Name;  
+
+                var portion = (popularItem.Y * 100) / 10; 
+                popularItem.Y = portion;
+            }
+
+            return popularItems;
+
+        }
 
 
     }
