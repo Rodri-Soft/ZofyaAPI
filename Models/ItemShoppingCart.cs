@@ -10,6 +10,8 @@ namespace ZofyaApi.Models
         public string SKU { get; set; } = null!;
         public int QuantityOfItems { get; set; }
         public decimal TotalItem { get; set; }
+        public string SizeSelected { get; set; } = null!;
+        public bool isOnOrder { get; set; }
 
         public virtual Item SKUNavigation { get; set; } = null!;
     }

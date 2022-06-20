@@ -35,14 +35,12 @@ namespace ZofyaApi.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=localhost;Database=Zofya;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=DESKTOP-G6HSTSE\\SQLEXPRESS;Database=Zofya;Trusted_Connection=True;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
-
             modelBuilder.Entity<Address>(entity =>
             {
                 entity.HasKey(e => e.IDAddress);
@@ -139,7 +137,7 @@ namespace ZofyaApi.Models
                 entity.Property(e => e.Discount).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.Gender)
-                    .HasMaxLength(50)
+                    .HasMaxLength(10)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Name)
@@ -163,6 +161,10 @@ namespace ZofyaApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SizeSelected)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.TotalItem).HasColumnType("decimal(18, 0)");
 
                 entity.HasOne(d => d.SKUNavigation)
@@ -173,7 +175,7 @@ namespace ZofyaApi.Models
 
             modelBuilder.Entity<Item_Color>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.IDItem_Color);
 
                 entity.ToTable("Item_Color");
 
@@ -186,14 +188,14 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.SKUNavigation)
-                    .WithMany()
+                    .WithMany(p => p.Item_Colors)
                     .HasForeignKey(d => d.SKU)
                     .HasConstraintName("FK_Item_Color_Item");
             });
 
             modelBuilder.Entity<Item_Image>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.IDItem_Image);
 
                 entity.ToTable("Item_Image");
 
@@ -204,14 +206,14 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.SKUNavigation)
-                    .WithMany()
+                    .WithMany(p => p.Item_Images)
                     .HasForeignKey(d => d.SKU)
                     .HasConstraintName("FK_Item_Image_Item");
             });
 
             modelBuilder.Entity<Item_Size>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.IDItem_Sizes);
 
                 entity.Property(e => e.SKU)
                     .HasMaxLength(50)
@@ -222,7 +224,7 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.SKUNavigation)
-                    .WithMany()
+                    .WithMany(p => p.Item_Sizes)
                     .HasForeignKey(d => d.SKU)
                     .HasConstraintName("FK_Item_Sizes_Item");
             });
@@ -232,8 +234,6 @@ namespace ZofyaApi.Models
                 entity.HasKey(e => e.IDItemWishList);
 
                 entity.ToTable("Item_WishList");
-
-                entity.Property(e => e.IDItemWishList).ValueGeneratedNever();
 
                 entity.Property(e => e.SKU)
                     .HasMaxLength(50)
@@ -256,9 +256,13 @@ namespace ZofyaApi.Models
 
                 entity.ToTable("Order");
 
-                entity.Property(e => e.Date).HasColumnType("date");
+                entity.Property(e => e.Date)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.DeliveryDate).HasColumnType("date");
+                entity.Property(e => e.DeliveryDate)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.OrderNumber)
                     .HasMaxLength(50)
@@ -269,6 +273,11 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.TotalToPay).HasColumnType("decimal(18, 0)");
+
+                entity.HasOne(d => d.IDAddressNavigation)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.IDAddress)
+                    .HasConstraintName("FK_Order_Address");
 
                 entity.HasOne(d => d.IDUserNavigation)
                     .WithMany(p => p.Orders)

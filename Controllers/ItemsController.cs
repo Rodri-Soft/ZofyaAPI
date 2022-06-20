@@ -1,5 +1,7 @@
 using ZofyaApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using ZofyaApi.ModelValidations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ZofyaApi.Controllers;
 
@@ -7,6 +9,7 @@ namespace ZofyaApi.Controllers;
 [Route("controller")]
 public class ItemsController : ControllerBase {
   private ZofyaContext dbContext;
+  private Log log = new Log();
 
   public ItemsController(ZofyaContext dbContext) {
     this.dbContext = dbContext;
@@ -81,7 +84,7 @@ public class ItemsController : ControllerBase {
     
     foreach (var item in auxiliaryItems)
     {
-      // item.Sizes = GetItemSizes(item.SKU);
+      item.Sizes = GetItemSizes(item.SKU);
       item.Colors = GetItemColors(item.SKU);
       item.Images = GetItemImages(item.SKU);
     }
@@ -112,5 +115,137 @@ public class ItemsController : ControllerBase {
     }
 
     return auxiliaryItem;
+  }
+
+  [HttpPost]
+  [Route("/PostUserWishesList")]
+  public List<WishList> PostUserWishesList(IDResult idUser) {    
+    int id = int.Parse(idUser.ID);
+
+    return dbContext.WishLists.Where(wishlist => 
+      wishlist.IDUser.Equals(id)).ToList();
+  }
+
+  [HttpPost]
+  [Route("/RegisterItemShoppingCart")]
+  public Result RegisterItemShoppingCart(ItemShoppingCartData itemShoppingCartData) {
+    List<String> errorMessages = new();
+    Result result = new();
+
+    try
+    {
+      bool existsInCart = dbContext.ItemShoppingCarts.Where(item => 
+        (item.IDShoppingCart == itemShoppingCartData.IDShoppingCart) && 
+        (item.SKU.Equals(itemShoppingCartData.SKU)) &&
+        (item.SizeSelected.Equals(itemShoppingCartData.SizeSelected)) && !item.isOnOrder).Count() > 0;
+
+      if (!existsInCart)
+      {
+        ItemShoppingCart itemShoppingCart = new ItemShoppingCart {
+          IDShoppingCart = itemShoppingCartData.IDShoppingCart,
+          SKU = itemShoppingCartData.SKU,
+          QuantityOfItems = itemShoppingCartData.QuantityOfItems,
+          TotalItem = itemShoppingCartData.TotalItem,
+          SizeSelected = itemShoppingCartData.SizeSelected,
+          isOnOrder = false
+        };
+
+        ShoppingCart shoppingCart = dbContext.ShoppingCarts.Where(shoppingCart =>
+          shoppingCart.IDShoppingCart == itemShoppingCartData.IDShoppingCart).First();
+        shoppingCart.IsEmpty = false;
+        shoppingCart.TotalBalance += itemShoppingCart.TotalItem;
+
+        dbContext.ItemShoppingCarts.Add(itemShoppingCart);
+        dbContext.SaveChanges();
+        result.correct = true;
+      } else {
+        errorMessages.Add("Repeated Item");
+        result.field = errorMessages;
+      }
+    }
+    catch (Exception e)
+    {
+      result.correct = false;
+      log.Add(e.ToString());
+      errorMessages.Add("Internal Server Error");
+      result.field = errorMessages;
+    } 
+    
+    return result;
+  }
+
+  [HttpPatch]
+  [Route("/UpdateCartProductQuantity")]
+  public Result UpdateCartProductQuantity(CartProductQuantityData cartProductQuantityData) {
+    List<String> errorMessages = new();
+    Result result = new();
+
+    try
+    {
+      ItemShoppingCart itemShoppingCart = dbContext.ItemShoppingCarts.Where(item =>
+        item.SKU.Equals(cartProductQuantityData.SKU) &&
+        (item.IDShoppingCart == cartProductQuantityData.ShoppingCartID) && 
+        (item.SizeSelected.Equals(cartProductQuantityData.Size)) && !item.isOnOrder).First();
+
+      decimal price = dbContext.Items.Where(item => 
+        item.SKU.Equals(cartProductQuantityData.SKU)).First().Price;
+      itemShoppingCart.QuantityOfItems += 1;
+      itemShoppingCart.TotalItem = itemShoppingCart.QuantityOfItems * price;
+
+      ShoppingCart shoppingCart = dbContext.ShoppingCarts.Where(shoppingCart =>
+      shoppingCart.IDShoppingCart == cartProductQuantityData.ShoppingCartID).First();
+      shoppingCart.TotalBalance += price;
+
+      dbContext.Entry(itemShoppingCart).State = EntityState.Modified;
+      dbContext.SaveChanges();
+      result.correct = true;      
+    }
+    catch (Exception e)
+    {
+      result.correct = false;
+      log.Add(e.ToString());
+      errorMessages.Add("Internal Server Error");      
+      result.field = errorMessages;
+    }
+
+    return result;
+  }
+
+  [HttpPost]
+  [Route("/RegisterItemInWishList")]
+  public Result RegisterItemInWishList(ItemWishListData itemWishListData) {
+    List<String> errorMessages = new();
+    Result result = new();
+
+    try
+    {
+      bool existsInWishList = dbContext.Item_WishLists.Where(item =>
+        (item.IDWishList == itemWishListData.IDWishList) && 
+        (item.SKU.Equals(itemWishListData.SKU))).Count() > 0;
+
+      if (!existsInWishList)
+      {
+        Item_WishList itemWishList = new Item_WishList {
+          IDWishList = itemWishListData.IDWishList,
+          SKU =  itemWishListData.SKU
+        };
+
+        dbContext.Item_WishLists.Add(itemWishList);
+        dbContext.SaveChanges();
+        result.correct = true;
+      } else {
+        errorMessages.Add("Repeated Item");
+        result.field = errorMessages;
+      }
+    }
+    catch (Exception e)
+    {
+      result.correct = false;
+      log.Add(e.ToString());
+      errorMessages.Add("Internal Server Error");
+      result.field = errorMessages;
+    }
+
+    return result;
   }
 }
