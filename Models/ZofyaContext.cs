@@ -258,9 +258,13 @@ namespace ZofyaApi.Models
 
                 entity.ToTable("Order");
 
-                entity.Property(e => e.Date).HasColumnType("date");
+                entity.Property(e => e.Date)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.DeliveryDate).HasColumnType("date");
+                entity.Property(e => e.DeliveryDate)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.OrderNumber)
                     .HasMaxLength(50)
@@ -271,6 +275,11 @@ namespace ZofyaApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.TotalToPay).HasColumnType("decimal(18, 0)");
+
+                entity.HasOne(d => d.IDAddressNavigation)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.IDAddress)
+                    .HasConstraintName("FK_Order_Address");
 
                 entity.HasOne(d => d.IDUserNavigation)
                     .WithMany(p => p.Orders)

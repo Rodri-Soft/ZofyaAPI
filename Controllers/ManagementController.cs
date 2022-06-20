@@ -33,6 +33,13 @@ namespace ZofyaApi.Controllers
         public staff? PostFindStaffEmail(IDResult idEmail)
         {
             return dbContext.staff.Where(s => s.Email == idEmail.ID).FirstOrDefault();
+        }   
+
+        [HttpPost]
+        [Route("/PostFindCustomerEmail")]
+        public Customer? PostFindCustomerEmail(IDResult idEmail)
+        {
+            return dbContext.Customers.Where(c => c.Email == idEmail.ID).FirstOrDefault();
         }     
 
         [HttpPost]
@@ -447,6 +454,232 @@ namespace ZofyaApi.Controllers
           
         }
 
+         [HttpPut]
+        [Route("/UpdateCustomer")]
+        public Result UpdateCustomer(AuxiliaryCustomerUpdate auxiliaryCustomerUpdate)
+        {
+
+            List<String> errorMessages = new List<String>();            
+            Result result = new Result();
+            List<String> errorFields = new List<String>();
+            CustomerData customerData = new CustomerData();            
+            
+            switch (auxiliaryCustomerUpdate.Field)
+            {
+               
+                case "email":             
+
+                    
+                    Result emailResult = customerData.validateEmail(auxiliaryCustomerUpdate.Value);
+
+                    if (!emailResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (emailResult.message != null)
+                        {
+                            errorMessages.Add(emailResult.message[0]);
+                        }
+
+                        errorFields.Add("email");
+
+                        break;
+                    }
+
+                    try
+                    {                  
+                        bool exist = dbContext.Customers.Where(
+                            c => c.Email.Equals(auxiliaryCustomerUpdate.Value)).Count() > 0;
+
+                        if (exist)
+                        {
+                            
+                            result.correct = false;
+                            errorMessages.Add("There is already an account registered with that Email");
+                            errorFields.Add("email");
+
+                            break;
+                        }                                                 
+                                            
+                        var customerDB = dbContext.Customers.FirstOrDefault(
+                            c => c.Email.Equals(auxiliaryCustomerUpdate.PrimaryKeyEmail));
+
+                        if (customerDB != null)
+                        {                            
+                            
+                            customerDB.Email = auxiliaryCustomerUpdate.Value;                           
+                            
+                            dbContext.Customers.Update(customerDB);
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The Email has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No customer found with that Email");
+                            errorFields.Add("email");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+
+                
+                case "fullname":             
+
+                    
+                    Result fullnameResult = customerData.validateFullname(auxiliaryCustomerUpdate.Value);
+
+                    if (!fullnameResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (fullnameResult.message != null)
+                        {
+                            errorMessages.Add(fullnameResult.message[0]);
+                        }
+
+                        errorFields.Add("fullname");
+
+                        break;
+                    }
+
+                    try
+                    {                                                          
+                                            
+                        var customerDB = dbContext.Customers.FirstOrDefault(
+                            c => c.Email.Equals(auxiliaryCustomerUpdate.PrimaryKeyEmail));
+
+                        if (customerDB != null)
+                        {                            
+                            
+                            customerDB.FullName = auxiliaryCustomerUpdate.Value;                           
+                            
+                            dbContext.Customers.Update(customerDB);
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The Fullname has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No customer found with that Email");
+                            errorFields.Add("email");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+
+                case "phone":             
+
+                    
+                    Result phoneResult = customerData.validatePhone(auxiliaryCustomerUpdate.Value);
+
+                    if (!phoneResult.correct)
+                    {
+                        
+                        result.correct = false;
+
+                        if (phoneResult.message != null)
+                        {
+                            errorMessages.Add(phoneResult.message[0]);
+                        }
+
+                        errorFields.Add("phone");
+
+                        break;
+                    }
+
+                    try
+                    {                                                          
+                                            
+                        var customerDB = dbContext.Customers.FirstOrDefault(
+                            c => c.Email.Equals(auxiliaryCustomerUpdate.PrimaryKeyEmail));
+
+                        if (customerDB != null)
+                        {                            
+                            
+                            customerDB.Phone = auxiliaryCustomerUpdate.Value;                           
+                            
+                            dbContext.Customers.Update(customerDB);
+                            dbContext.SaveChanges();
+
+                            List<String> successMessage = new List<String>();
+                            successMessage.Add("The Phone has been successfully updated");
+
+                            result.correct = true;
+                            result.message = successMessage;
+                            return result;
+
+                        }
+                        else
+                        {
+                            result.correct = false;
+                            errorMessages.Add("No customer found with that Email");
+                            errorFields.Add("email");
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Result exceptionResult = new Result();
+                        exceptionResult.correct = false;
+
+                        errorMessages.Clear();
+                        log.Add(e.ToString());
+                        errorMessages.Add("Internal Server Error");                        
+
+                        exceptionResult.message = errorMessages;
+                        return exceptionResult;
+                    }
+
+                default:
+                    break;
+            }
+
+            result.message = errorMessages;
+            result.field = errorFields;
+
+            return result;
+          
+        }
+
 
         [HttpPut]
         [Route("/UpdateAdministratorPassword")]
@@ -540,8 +773,100 @@ namespace ZofyaApi.Controllers
                 exceptionResult.message = errorMessages;
                 return exceptionResult;
             }
+        }
 
+        [HttpPut]
+        [Route("/UpdateCustomerPassword")]
+        public Result UpdateCustomerPassword(AuxiliaryCustomerPasswordUpdate auxiliaryCustomerPasswordUpdate)
+        {
 
+            List<String> errorMessages = new List<String>();
+            Result result = new Result();
+            List<String> errorFields = new List<String>();
+            CustomerData customerData = new CustomerData();     
+
+            try
+            {
+
+                var customerDB = dbContext.Customers.FirstOrDefault(
+                        c => c.Email.Equals(auxiliaryCustomerPasswordUpdate.PrimaryKeyEmail));
+
+                if (customerDB == null)
+                {
+                    
+                    result.correct = false;
+                    errorMessages.Add("No customer found with that Email");
+                    errorFields.Add("email");
+                    
+                    result.message = errorMessages;
+                    result.field = errorFields;
+
+                    return result;
+
+                }
+
+                string currentPassword = Encrypt.GetSHA256(auxiliaryCustomerPasswordUpdate.CurrentValue);
+                
+                if (!(currentPassword.Equals(customerDB.Password)))
+                {
+
+                    result.correct = false;
+                    errorMessages.Add("Wrong current password");
+                    errorFields.Add("password");
+                    
+                    result.message = errorMessages;
+                    result.field = errorFields;
+
+                    return result;
+
+                }
+                
+                Result passwordResult = customerData.validatePassword(auxiliaryCustomerPasswordUpdate.NewValue);
+
+                if (!passwordResult.correct)
+                {
+
+                    result.correct = false;
+
+                    if (passwordResult.message != null)
+                    {
+                        errorMessages.Add(passwordResult.message[0]);
+                    }
+
+                    errorFields.Add("password");
+
+                    result.message = errorMessages;
+                    result.field = errorFields;
+
+                    return result;
+                }
+
+                string newPassword = Encrypt.GetSHA256(auxiliaryCustomerPasswordUpdate.NewValue);
+                customerDB.Password = newPassword;
+
+                dbContext.Customers.Update(customerDB);
+                dbContext.SaveChanges();
+
+                List<String> successMessage = new List<String>();
+                successMessage.Add("The Password has been successfully updated");
+
+                result.correct = true;
+                result.message = successMessage;
+                return result;
+                                
+            }
+            catch (Exception e)
+            {
+                Result exceptionResult = new Result();
+                exceptionResult.correct = false;
+
+                errorMessages.Clear();
+                log.Add(e.ToString());
+                errorMessages.Add("Internal Server Error");
+
+                exceptionResult.message = errorMessages;
+                return exceptionResult;
+            }
         }
 
         [HttpPost]
@@ -925,8 +1250,7 @@ namespace ZofyaApi.Controllers
                 List<String> errorFields = new List<String>();
 
                 bool isCorrect = true;
-
-                // Basic fields validations
+                
                 AuxiliaryAdministrationAddItem itemValidation = new AuxiliaryAdministrationAddItem();
 
                 Result skuResult = itemValidation.validateAverageField(auxiliaryAdministrationAddItem.SKU, "SKU");
@@ -1086,7 +1410,7 @@ namespace ZofyaApi.Controllers
                         item_Color.Color = color;
 
                         dbContext.Item_Colors.Add(item_Color);
-                        // dbContext.SaveChanges();
+                        
                     }
 
                     foreach (var image in imagesList)
@@ -1096,7 +1420,7 @@ namespace ZofyaApi.Controllers
                         item_Image.ImageURL = image;
 
                         dbContext.Item_Images.Add(item_Image);
-                        // dbContext.SaveChanges();
+                        
                     }
 
                     foreach (var size in sizesList)
@@ -1105,8 +1429,7 @@ namespace ZofyaApi.Controllers
                         item_Size.SKU = auxiliaryAdministrationAddItem.SKU;
                         item_Size.Size = size;
 
-                        dbContext.Item_Sizes.Add(item_Size);
-                        // dbContext.SaveChanges();
+                        dbContext.Item_Sizes.Add(item_Size);                        
                     }                    
                                                        
                     dbContext.SaveChanges();
@@ -1174,12 +1497,48 @@ namespace ZofyaApi.Controllers
             {
                 var item = dbContext.Items.Where(i => i.SKU == popularItem.Name).FirstOrDefault();  
                 popularItem.Name = item.Name;  
-
-                var portion = (popularItem.Y * 100) / 10; 
+                
+                var portion = (popularItem.Y * 100) / totalPortion; 
                 popularItem.Y = portion;
             }
 
             return popularItems;
+
+        }
+
+        [HttpGet]
+        [Route("/DeliveryOrders")]
+        public List<DeliveryOrder> GetDeliveryOrders()
+        {
+            List<DeliveryOrder> deliveryOrders= new List<DeliveryOrder>(); 
+            double totalPortion = 0;
+            
+            foreach(var line in dbContext.Orders.GroupBy(info => info.DeliveryDate)
+                                    .Select(group => new { 
+                                        Metric = group.Key, 
+                                        Count = group.Count() 
+                                    })
+                                    .OrderBy(x => x.Metric))
+            {                
+
+                totalPortion += line.Count;
+                
+                DeliveryOrder deliveryOrder = new DeliveryOrder();
+                deliveryOrder.Name = line.Metric;
+                deliveryOrder.Y = line.Count;
+                deliveryOrder.Drilldown = line.Metric;                
+                
+                deliveryOrders.Add(deliveryOrder);                
+            }
+
+            foreach (var deliveryOrder in deliveryOrders)
+            {               
+                
+                var portion = (deliveryOrder.Y * 100) / totalPortion; 
+                deliveryOrder.Y = portion;
+            }
+
+            return deliveryOrders;
 
         }
 

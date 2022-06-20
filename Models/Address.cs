@@ -8,6 +8,7 @@ namespace ZofyaApi.Models
         public Address()
         {
             Customer_Addresses = new HashSet<Customer_Address>();
+            Orders = new HashSet<Order>();
         }
 
         public int IDAddress { get; set; }
@@ -19,5 +20,6 @@ namespace ZofyaApi.Models
         public string StreetName { get; set; } = null!;
 
         public virtual ICollection<Customer_Address> Customer_Addresses { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }
