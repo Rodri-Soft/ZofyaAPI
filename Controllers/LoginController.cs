@@ -221,7 +221,7 @@ namespace ZofyaApi.Controllers
            
             List<ItemShoppingCart> itemShoppingCarts = (from isc in dbContext.ItemShoppingCarts
                                                         where isc.IDShoppingCart == Int32.Parse(idShoppingCart.ID)
-                                                        select isc).ToList();
+                                                        select isc).Where(item => !item.isOnOrder).ToList();
 
             return itemShoppingCarts.Count();
             
