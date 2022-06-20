@@ -1,0 +1,5 @@
+20/06/2022 03:48:47 - System.InvalidOperationException: Sequence contains no elements
+   at System.Linq.ThrowHelper.ThrowNoElementsException()
+   at lambda_method891(Closure , QueryContext )
+   at System.Linq.Queryable.First[TSource](IQueryable`1 source)
+   at ZofyaApi.Controllers.CartController.DeleteItemShoppingCart(Int32 idItemShoppingCart) in C:\Users\Rodrigo Sanchez\OneDrive - Universidad Veracruzana\Documentos\SextoSemestre\Desarrollo de sistemas en red\Proyecto\ZofyaApi\Controllers\CartController.cs:line 62
